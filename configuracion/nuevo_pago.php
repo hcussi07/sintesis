@@ -1,13 +1,15 @@
 <?php
 include_once "config.inc.php";
-$codref_factura = $_POST['codref_factura'];
-$fecha_factura = date("Y-m-d",strtotime($_POST['fecha_factura']));
-$nro_cuota = $_POST['nro_cuota'];
-$nro_factura = $_POST['nro_factura'];
-$monto_factura = $_POST['monto_factura'];
+$codref_pago = $_POST['codref_pago'];
+$fecha_pago = date("Y-m-d",strtotime($_POST['fecha_pago']));
+$nro_cuota_pago = $_POST['nro_cuota_pago'];
+$recibido = $_POST['recibido'];
+$forma_pago = $_POST['forma_pago'];
+$cancelado = $_POST['cancelado'];
+$observaciones = $_POST['observaciones'];
 
 
-$query = "INSERT INTO facturar VALUES (null, '$codref_factura', '$fecha_factura','$nro_cuota' ,'$nro_factura','$monto_factura')";
+$query = "INSERT INTO pagar VALUES (null,'$codref_pago' ,'$fecha_pago', '$nro_cuota_pago' ,'$recibido','$forma_pago','$cancelado','$observaciones')";
 if(!mysql_query($query)){
     echo mysql_error();
 }

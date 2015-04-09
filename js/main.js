@@ -1,5 +1,7 @@
 $(document).on("ready",inicio);
 function inicio(){
+
+
     datePick("fecha_registro","0");
     datePick("fecha_fin","+1y-1d");
     datePick("betm_venc","+1y-1d");
@@ -84,6 +86,56 @@ function inicio(){
             }
             $('#monto_betm').focus();
         });
+
+}
+
+function openDialogElimina(idPop, tamano){
+    $("#"+idPop).dialog({autoOpen: false,
+        buttons:{
+            SI:function(){
+                $(this).dialog("close");
+                 $.ajax({
+                 url: 'configuracion/delete_cliente.php',
+                 type: 'GET',
+                 async: false,
+                 data: "idcliente="+$("#val_elimina").val(),
+                 success: function(data){
+                 recargarTablaListado();
+
+                 },
+                 error: muestraError
+                 });
+            },
+            NO:function(){
+                $(this).dialog("close");
+            }
+        },
+        width: tamano});
+}
+
+
+function openDialog(idPop, tamano){
+    $("#"+idPop).dialog({autoOpen: false,
+        buttons:{
+            OK:function(){
+                $(this).dialog("close");
+
+                switch (idPop){
+                    case "pop_factura":
+                        guardarfactura();
+                        break;
+                    case "pop_pagos":
+                        guardarpago();
+                        break
+                }
+            }
+        },
+        width: tamano});
+}
+
+function funcPop(idpop){
+
+    ($("#"+idpop).dialog("isOpen") == false) ? $("#"+idpop).dialog("open") : $("#"+idpop).dialog("close") ;
 }
 
 function guardarDatos(){
@@ -426,4 +478,23 @@ function guardarControl(){
         },
         error: muestraError
     });
+}
+
+function recargarTablaListado(){
+    $.ajax({
+        url: 'configuracion/cargar_tabla_listado.php',
+        type: 'POST',
+        async: false,
+        data: "idcliente="+1,
+        success: function(data){
+            $("#contenido_listado").html(data);
+            $(".btn_elimina").on("click", function(){funcPop("pop_elimina");});
+            openDialogElimina("pop_elimina",450);
+        },
+        error: muestraError
+    });
+}
+
+function elimina_cliente(str){
+    $("#val_elimina").val(str);
 }

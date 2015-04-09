@@ -1,8 +1,6 @@
 <?php
 session_start();
-include_once "configuracion/config.inc.php";
-$query = "SELECT * FROM clientes";
-$result = mysql_query($query);
+
 ?>
 <!DOCTYPE html>
 <html lang="es" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
@@ -26,10 +24,11 @@ $result = mysql_query($query);
 
     <style>
         #error_cuotabetm, #error_cuotaweb, #error_cuotapublicidad,#error_cuotasponsor{display:none;color: #cd0a0a}
+        .ui-widget-header,.ui-state-default, .ui-button{background:#cd0a0a; border: 1px solid #a94442; color: #FFFFFF;}
     </style>
 </head>
 
-<body>
+<body onload="recargarTablaListado()">
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
@@ -81,92 +80,24 @@ $result = mysql_query($query);
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
             <!-- INICIO FORMULARIO PARA CREAR -->
-            <table class="table table-striped table-hover">
-                <thead>
-                <th>Nº</th>
-                <th>FECHA INICIO</th>
-                <th>FECHA FIN</th>
-                <th>RAZON SOCIAL</th>
-                <th>EMPRESA</th>
-                <th>REP. LEGAL</th>
-                <th>BETM</th>
-                <th>WEB</th>
-                <th>SPO</th>
-                <th>PUBL</th>
-                <th>INT</th>
-                <th>DETALLE</th>
-                <th>EDITAR</th>
-                <th>ELIMINAR</th>
-                </thead>
-                <?php
-                while($row = mysql_fetch_array($result)){
-                    $query1 = "SELECT * FROM susbolivia WHERE codref = ".$row['cod'] ." LIMIT 0,1";
-                    $result1 = mysql_query($query1);
-                    $row1 = mysql_fetch_array($result1);
+            <div id="contenido_listado">
 
-                    $query2 = "SELECT * FROM web WHERE codref = ".$row['cod'] ." LIMIT 0,1";
-                    $result2 = mysql_query($query2);
-                    $row2 = mysql_fetch_array($result2);
-
-                    $query3 = "SELECT * FROM sponsor WHERE codref = ".$row['cod'] ." LIMIT 0,1";
-                    $result3 = mysql_query($query3);
-                    $row3 = mysql_fetch_array($result3);
-
-                    $query4 = "SELECT * FROM publicidad WHERE codref = ".$row['cod'] ." LIMIT 0,1";
-                    $result4 = mysql_query($query4);
-                    $row4 = mysql_fetch_array($result4);
-                    ?>
-                    <tr>
-                        <td><?=$row['cod']?></td>
-                        <td><?=$row['fechar']?></td>
-                        <td><?=$row['fechafin']?></td>
-                        <td><?=$row['razons']?></td>
-                        <td><?=$row['ncempresa']?></td>
-                        <td><?=$row['rlegal']?></td>
-
-                        <?php
-                        if($row1 !=null){?>
-                            <td><img src='img/icon_check.png' width = '15px'></td>
-                        <?php
-                        }else{?>
-                            <td><img src='img/icon_cancel2.png' width = '15px'></td>
-                        <?php
-                        }
-                        if($row2 !=null){?>
-                            <td><img src='img/icon_check.png' width = '15px'></td>
-                        <?php
-                        }else{?>
-                            <td><img src='img/icon_cancel2.png' width = '15px'></td>
-                        <?php
-                        }
-                        if($row3 !=null){?>
-                            <td><img src='img/icon_check.png' width = '15px'></td>
-                        <?php
-                        }else{?>
-                            <td><img src='img/icon_cancel2.png' width = '15px'></td>
-                        <?php
-                        }
-                        if($row4 !=null){?>
-                            <td><img src='img/icon_check.png' width = '15px'></td>
-                        <?php
-                        }else{?>
-                            <td><img src='img/icon_cancel2.png' width = '15px'></td>
-                        <?php
-                        }
-                        ?>
-                        <td><img src='img/icon_help.png' width = '25px'></td>
-                        <td><a href="detalle_cliente.php?idcliente=<?=$row["cod"]?>" class='btn btn-info'>Ver</a></td>
-                        <td><a href=""><img src='img/icon_editar.png' width = '25px'></a></td>
-                        <td><a href=""><img src='img/icon_uncheck.png' width = '20px'></a></td>
-                    </tr>
-                <?php
-                }
-                ?>
-            </table>
+            </div>
+            <div id="pop_elimina" title="Eliminar?">
+                <div class="form-group form-group-sm">
+                    <img src="img/icon_alerta.png" width="80px">
+                    <div class="col-lg-8">
+                        <label>¿Esta seguro de que desea eliminar este registro?</label>
+                        <input type="hidden" id="val_elimina">
+                    </div>
+                </div>
+            </div>
             <!-- FIN FORMULARIOS PARA CREAR-->
         </div>
+
     </div>
 </div>
+
 
 <!-- Bootstrap core JavaScript
 ================================================== -->

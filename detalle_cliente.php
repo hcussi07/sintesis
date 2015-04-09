@@ -32,7 +32,6 @@ function decimal($num){
     <link rel="stylesheet" href="css/jquery-ui.css">
 
     <style>
-
         #error_cuotabetm, #error_cuotaweb, #error_cuotapublicidad,#error_cuotasponsor{display:none;color: #cd0a0a}
         .ui-widget-header,.ui-state-default, .ui-button{background:#337AB7; border: 1px solid #66afe9; color: #FFFFFF;}
     </style>
@@ -177,11 +176,28 @@ function decimal($num){
     $query5 = "SELECT tzcambio FROM tc LIMIT 0,1";
     $result5 = mysql_query($query5);
     $row5 = mysql_fetch_array($result5);
-    $totalbs = $total*$row5['tzcambio'];
 
     $query6 = "SELECT * FROM facturar WHERE codref = $idcliente";
     $result6 = mysql_query($query6);
 
+    $inter ="";
+    $sumaintercambio = 0;
+    if($row1['intercambio']=="si"){
+        $inter = $inter."BETM + ";
+        $sumaintercambio = $sumaintercambio + $row1['inter_monto'];
+    }
+    if($row2['intercambio']=="si"){
+        $inter = $inter."WEB + ";
+        $sumaintercambio = $sumaintercambio + $row2['inter_monto'];
+    }
+    if($row3['intercambio']=="si"){
+        $inter = $inter."SPONSOR + ";
+        $sumaintercambio = $sumaintercambio + $row3['inter_monto'];
+    }
+    if($row4['intercambio']=="si"){
+        $inter = $inter."PUBLI";
+        $sumaintercambio = $sumaintercambio + $row4['inter_monto'];
+    }
 
     ?>
     <div class="col-xs-6 text-left">
@@ -242,6 +258,17 @@ function decimal($num){
                         </tr>
                     <?php
                     }
+                    if($sumaintercambio != 0){
+                        $total = $total+$sumaintercambio;?>
+                        <tr>
+                            <td ><label>Intercambio</label></td>
+                            <td><?=$inter?></td>
+                            <td class="text-right"><?=decimal($sumaintercambio)?></td>
+
+                        </tr>
+                    <?php
+                    }
+                    $totalbs = $total*$row5['tzcambio'];
                     ?>
                     <tr>
                         <td><label>Total $us.</label></td>
@@ -267,6 +294,7 @@ function decimal($num){
         <tr>
             <td><input type="button" class="btn btn-info" value="Facturar" id="btn_factura"></td>
             <td><input type="button" class="btn btn-info" value="Pagos" id="btn_pagos"></td>
+            <td><input type="button" class="btn btn-info" value="Intercambio" id="btn_intercambio"></td>
         </tr>
     </table>
 </div>
@@ -339,7 +367,7 @@ function decimal($num){
         <div class="form-group form-group-sm">
             <label for="observaciones" class="col-lg-4 control-label">Observaciones</label>
             <div class="col-lg-8">
-                <input type="number" id="observaciones" name="observaciones" class="form-control" step="any" required>
+                <input type="text" id="observaciones" name="observaciones" class="form-control" step="any" required>
             </div>
         </div>
 

@@ -3,29 +3,32 @@ include_once "config.inc.php";
 $idcliente = $_POST['idcliente'];
 
 $query1 = "SELECT * FROM susbolivia WHERE codref = $idcliente LIMIT 0,1";
-$result1 = mysql_query($query1);
+$result1 = mysql_query($query1) or die(mysql_error());
 $row1 = mysql_fetch_array($result1);
 
 $query2 = "SELECT * FROM web WHERE codref = $idcliente LIMIT 0,1";
-$result2 = mysql_query($query2);
+$result2 = mysql_query($query2) or die(mysql_error());
 $row2 = mysql_fetch_array($result2);
 
 $query3 = "SELECT * FROM sponsor WHERE codref = $idcliente LIMIT 0,1";
-$result3 = mysql_query($query3);
+$result3 = mysql_query($query3) or die(mysql_error());
 $row3 = mysql_fetch_array($result3);
 
 $query4 = "SELECT * FROM publicidad WHERE codref = $idcliente LIMIT 0,1";
-$result4 = mysql_query($query4);
+$result4 = mysql_query($query4) or die(mysql_error());
 $row4 = mysql_fetch_array($result4);
 $total= $row1['total']+$row2['total']+$row3['totals']+$row4['totalpubli'];
 
 $query5 = "SELECT tzcambio FROM tc LIMIT 0,1";
-$result5 = mysql_query($query5);
+$result5 = mysql_query($query5) or die(mysql_error());
 $row5 = mysql_fetch_array($result5);
 $totalbs = $total*$row5['tzcambio'];
 
 $query6 = "SELECT * FROM facturar WHERE codref = $idcliente";
 $result6 = mysql_query($query6);
+
+$query7 = "SELECT * FROM pagar WHERE codref = $idcliente";
+$result7 = mysql_query($query7);
 
 function decimal($num){
     return number_format($num, 2, ",", ".");
@@ -61,7 +64,7 @@ function decimal($num){
 </thead>
 <tbody>
 <?php
-$mayor = 0;$suma = 0;$sus=0;$subs = 0;$sumafactura=0;
+$mayor = 0;$suma = 0;$sus=0;$subs = 0;$sumafactura=0;$sumacancelado = 0;
 if($row1['ncuotas']>$mayor){
     $mayor=$row1['ncuotas'];
 }
@@ -76,6 +79,7 @@ if($row4['ncotasp']>$mayor){
 }
 for($i = 1; $i <= $mayor; $i++){
     $row6 = mysql_fetch_array($result6);
+    $row7 = mysql_fetch_array($result7);
     $fec1 = explode("@",$row1['cuota'.$i]);
     $fec2 = explode("@",$row2['wcota'.$i]);
     $fec3 = explode("@",$row3['scota'.$i]);
@@ -152,20 +156,54 @@ for($i = 1; $i <= $mayor; $i++){
         <td class="text-right">
             <?php
             $sumafactura = $sumafactura + $row6['monto_factura'];
-                echo decimal($row6['monto_factura']);
+            echo decimal($row6['monto_factura']);
             ?></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td><?=$row7['fecha_pago'];?></td>
+        <td><?=$row7['recibido'];?></td>
+        <td><?=$row7['forma_pago'];?></td>
+        <td class="text-right"><?php
+            $sumacancelado = $sumacancelado + $row7['cancelado'];
+            echo decimal($row7['cancelado']);
+            ?></td>
+        <td><?=$row7['observaciones'];?></td>
+    </tr>
+<?php
+}
+$sumaintercambio = 0;
+if($row1['intercambio']=="si"){
+    $sumaintercambio = $sumaintercambio + $row1['inter_monto'];
+}
+if($row2['intercambio']=="si"){
+    $sumaintercambio = $sumaintercambio + $row2['inter_monto'];
+}
+if($row3['intercambio']=="si"){
+    $sumaintercambio = $sumaintercambio + $row3['inter_monto'];
+}
+if($row4['intercambio']=="si"){
+    $sumaintercambio = $sumaintercambio + $row4['inter_monto'];
+}
 
+if($sumaintercambio != 0){
+    $suma = $suma + $sumaintercambio;
+    $sus = $sus + $sumaintercambio;
+    $subs = $subs + ($sumaintercambio*$row5['tzcambio']);
+    ?>
+    <tr>
+        <td colspan="3"><label>INTERCAMBIO DE SERVICIOS</label></td>
+        <td class="text-right"><?=decimal($sumaintercambio)?></td>
+        <td class="text-right"><?=decimal($sumaintercambio)?></td>
+        <td class="text-right"><?=decimal($sumaintercambio*$row5['tzcambio'])?></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
     </tr>
 <?php
 }
 ?>
-
-
 </tbody>
 <tfoot>
 <tr>
@@ -178,6 +216,7 @@ for($i = 1; $i <= $mayor; $i++){
     <td class="text-right"><?=decimal($sumafactura)?></td>
     <td></td>
     <td></td>
+    <td></td><td class="text-right"><?=decimal($sumacancelado)?></td>
     <td></td>
 </tr>
 </tfoot>
